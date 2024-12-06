@@ -2,7 +2,11 @@ import random
 import time
 from kafka import KafkaProducer
 from .config import KAFKA_CONFIG, TOPIC_NAME
-from ..shared.utils import serialize_message, format_timestamp
+import json
+from datetime import datetime
+
+def serialize_message(message):
+    return json.dumps(message).encode('utf-8')
 
 producer = KafkaProducer(
     **KAFKA_CONFIG,
@@ -14,10 +18,11 @@ def generate_sensor_data():
         'sensor_id': random.randint(1, 5),
         'temperature': round(random.uniform(20, 30), 2),
         'humidity': round(random.uniform(30, 70), 2),
-        'timestamp': format_timestamp()
+        'timestamp': datetime.now().isoformat()
     }
 
 def main():
+    print("Starting producer...")
     while True:
         try:
             data = generate_sensor_data()

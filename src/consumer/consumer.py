@@ -1,18 +1,22 @@
 from kafka import KafkaConsumer
+import json
 from datetime import datetime
-from .config import KAFKA_CONFIG, TOPIC_NAME, GROUP_ID
+from .config import KAFKA_CONFIG, TOPIC_NAME
 from .models import Session, SensorReading, init_db
-from ..shared.utils import deserialize_message
+
+def deserialize_message(message):
+    return json.loads(message.decode('utf-8'))
 
 consumer = KafkaConsumer(
     TOPIC_NAME,
     **KAFKA_CONFIG,
-    value_deserializer=deserialize_message,
-    group_id=GROUP_ID
+    value_deserializer=deserialize_message
 )
 
 def main():
+    print("Initializing database...")
     init_db()
+    print("Starting consumer...")
     session = Session()
 
     try:

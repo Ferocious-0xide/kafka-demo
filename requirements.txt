@@ -14,5 +14,6 @@ pycodestyle==2.12.1
 pyflakes==3.2.0
 pytest==8.3.4
 python-dotenv==1.0.1
+six==1.16.0
 SQLAlchemy==2.0.36
 typing_extensions==4.12.2

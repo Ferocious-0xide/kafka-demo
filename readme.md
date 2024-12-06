@@ -112,6 +112,11 @@ git push heroku main
 
 # Scale dynos
 heroku ps:scale producer=1 consumer=1
+
+or 
+
+# Scale dynos to standard-1x
+heroku ps:scale producer=1:standard-1x consumer=1:standard-1x
 ```
 
 ## Project Structure

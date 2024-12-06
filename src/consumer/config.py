@@ -1,5 +1,6 @@
 import os
 import tempfile
+import ssl
 from urllib.parse import urlparse
 
 def write_cert_to_temp_file(cert_content):
@@ -28,8 +29,13 @@ KAFKA_CONFIG = {
     'ssl_cafile': ssl_cafile,
     'ssl_certfile': ssl_certfile,
     'ssl_keyfile': ssl_keyfile,
+    'ssl_check_hostname': False,
+    'ssl_context': ssl.create_default_context(),
     'group_id': 'sensor-data-group'
 }
+
+# Disable hostname checking
+KAFKA_CONFIG['ssl_context'].check_hostname = False
 
 # Ensure DATABASE_URL is postgresql:// not postgres://
 DATABASE_URL = os.getenv('DATABASE_URL').replace('postgres://', 'postgresql://', 1)

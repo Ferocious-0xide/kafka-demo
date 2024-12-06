@@ -23,19 +23,19 @@ ssl_cafile = write_cert_to_temp_file(os.getenv('KAFKA_TRUSTED_CERT'))
 ssl_certfile = write_cert_to_temp_file(os.getenv('KAFKA_CLIENT_CERT'))
 ssl_keyfile = write_cert_to_temp_file(os.getenv('KAFKA_CLIENT_CERT_KEY'))
 
+# Create SSL context
+ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+ssl_context.load_cert_chain(ssl_certfile, ssl_keyfile)
+ssl_context.load_verify_locations(ssl_cafile)
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
+
 KAFKA_CONFIG = {
     'bootstrap_servers': parse_kafka_url(os.getenv('KAFKA_URL')),
     'security_protocol': 'SSL',
-    'ssl_cafile': ssl_cafile,
-    'ssl_certfile': ssl_certfile,
-    'ssl_keyfile': ssl_keyfile,
-    'ssl_check_hostname': False,
-    'ssl_context': ssl.create_default_context(),
+    'ssl_context': ssl_context,
     'group_id': 'sensor-data-group'
 }
-
-# Disable hostname checking
-KAFKA_CONFIG['ssl_context'].check_hostname = False
 
 # Ensure DATABASE_URL is postgresql:// not postgres://
 DATABASE_URL = os.getenv('DATABASE_URL').replace('postgres://', 'postgresql://', 1)

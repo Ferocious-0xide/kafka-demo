@@ -1,5 +1,6 @@
 import os
 import tempfile
+import ssl
 from urllib.parse import urlparse
 
 def write_cert_to_temp_file(cert_content):
@@ -22,12 +23,17 @@ ssl_cafile = write_cert_to_temp_file(os.getenv('KAFKA_TRUSTED_CERT'))
 ssl_certfile = write_cert_to_temp_file(os.getenv('KAFKA_CLIENT_CERT'))
 ssl_keyfile = write_cert_to_temp_file(os.getenv('KAFKA_CLIENT_CERT_KEY'))
 
+# Create SSL context
+ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+ssl_context.load_cert_chain(ssl_certfile, ssl_keyfile)
+ssl_context.load_verify_locations(ssl_cafile)
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
+
 KAFKA_CONFIG = {
     'bootstrap_servers': parse_kafka_url(os.getenv('KAFKA_URL')),
     'security_protocol': 'SSL',
-    'ssl_cafile': ssl_cafile,
-    'ssl_certfile': ssl_certfile,
-    'ssl_keyfile': ssl_keyfile,
+    'ssl_context': ssl_context,
 }
 
 TOPIC_NAME = 'sensor-data'

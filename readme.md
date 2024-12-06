@@ -74,7 +74,7 @@ pip install -r requirements.txt
 ```bash
 heroku create kafka-demo-app
 heroku addons:create heroku-kafka:basic-0
-heroku addons:create heroku-postgresql:hobby-dev
+heroku addons:create heroku-postgresql:essential-0
 ```
 
 2. Create Kafka topic:

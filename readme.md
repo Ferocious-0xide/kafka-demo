@@ -251,6 +251,139 @@ git push origin feature/your-feature-name
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+## Testing and Verification
+
+### Quick Start Test
+
+1. Verify Kafka Topic:
+```bash
+# List all topics
+heroku kafka:topics:list
+
+# Check topic details
+heroku kafka:topics:info sensor-data
+```
+
+2. Monitor Data Flow:
+```bash
+# Watch producer logs (run in one terminal)
+heroku logs --tail --dyno producer
+
+# Watch consumer logs (run in another terminal)
+heroku logs --tail --dyno consumer
+```
+
+3. Verify Data Storage:
+```bash
+# Connect to PostgreSQL
+heroku pg:psql
+
+# View latest readings
+SELECT * FROM sensor_readings 
+ORDER BY timestamp DESC 
+LIMIT 5;
+
+# View data summaries
+SELECT 
+    sensor_id,
+    COUNT(*) as total_readings,
+    AVG(temperature) as avg_temperature,
+    AVG(humidity) as avg_humidity,
+    MIN(timestamp) as first_reading,
+    MAX(timestamp) as latest_reading
+FROM sensor_readings 
+GROUP BY sensor_id;
+```
+
+### Monitoring Dashboard
+
+Monitor your application's health:
+```bash
+# View application metrics
+heroku metrics
+
+# View Kafka metrics
+heroku kafka:metrics
+
+# View PostgreSQL metrics
+heroku pg:info
+```
+
+### Common Testing Scenarios
+
+1. Verify Producer is Running:
+```bash
+# Check dyno status
+heroku ps
+
+# Expected output should show both producer and consumer as "up"
+```
+
+2. Check Message Processing:
+```bash
+# Check consumer lag
+heroku kafka:consumer-groups:lag
+
+# If lag is growing, consumer might be falling behind
+```
+
+3. Database Health:
+```bash
+# Check database size and row counts
+heroku pg:info
+
+# Check table statistics
+heroku pg:psql
+=> SELECT relname as table_name, n_live_tup as row_count 
+   FROM pg_stat_user_tables 
+   WHERE relname = 'sensor_readings';
+```
+
+### Troubleshooting Tests
+
+If you're not seeing data:
+
+1. Check Kafka Connection:
+```bash
+# Verify Kafka is running
+heroku kafka:info
+
+# Check topic exists and is receiving messages
+heroku kafka:topics:info sensor-data
+```
+
+2. Check Consumer Group:
+```bash
+# List consumer groups
+heroku kafka:consumer-groups
+
+# Check consumer group lag
+heroku kafka:consumer-groups:lag
+```
+
+3. Check Database Connection:
+```bash
+# Verify database connection
+heroku pg:info
+
+# Check for database connectivity issues in logs
+heroku logs --tail --dyno consumer | grep "database"
+```
+
+### Performance Testing
+
+Monitor system performance:
+```bash
+# View resource usage
+heroku ps:utilization
+
+# View response time metrics
+heroku metrics:web
+
+# View PostgreSQL performance metrics
+heroku pg:diagnose
+```
+
 ## Clean Up
 
 ### Local Clean Up
